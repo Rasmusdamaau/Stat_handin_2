@@ -12,8 +12,6 @@ library(tidyverse)
 
 
 ```{r}
-
-
 data <- data.frame(x = 1:10, y = c(5.52127567436017,
                                    6.85340682052011,
                                    10.0201614384284,
@@ -37,28 +35,40 @@ ggplot(data, aes(x,y)) +
   stat_function(fun = mod2_fun, color = "red")
 
 
-#estimate for beta in linear model
+#estimat for beta i linear model
 mod1$coefficients[2]
-#estimate for beta in polynomial model
+#estimat for beta i polynomial model
 mod2$coefficients[2:3]
+```
 
-# kan model 2 reduceres til model 1? : H0: beta_2 = 0, H1: beta_2 |= 0, ved alpha = 0.05
+kan model 2 reduceres til model 1? : H0: beta_2 = 0, H1: beta_2 |= 0, ved alpha = 0.05
 
+```{r}
 anova(mod0,mod1)
 anova(mod1,mod2)
-# da Pr(>F) > 0.05 accepteres H0 ved 5% signifikans niveau
+```
 
-# R^2 og R_adj for mod 1
-summary(mod1)$r.squared
+
+da Pr(>F) > 0.05 accepteres H0 ved 5% signifikans niveau
+
+
+```{r}
+summary(mod1)$r.squared # R^2 og R_adj for mod 1
 summary(mod1)$adj.r.squared
-# R^2 og R_adj for mod 2
-summary(mod2)$r.squared
+
+
+summary(mod2)$r.squared # R^2 og R_adj for mod 2
 summary(mod2)$adj.r.squared
 
 confint(mod1)
 confint(mod2)
-# da konfidens intervallet for beta_2 i mod 2 ligger omkring 0 støtter det hypotesen fra tidligere om at beta_2 = 0
-# da konfidens intervallet for beta_1 i mod 1 ikke ligger omkring 0, så viser det at beta_1 ikke er lig 0 og altså er mod1 bedre end mod0
+```
+
+
+da konfidens intervallet for beta_2 i mod 2 ligger omkring 0 støtter det hypotesen fra tidligere om at beta_2 = 0
+da konfidens intervallet for beta_1 i mod 1 ikke ligger omkring 0, så viser det at beta_1 ikke er lig 0 og altså er mod1 bedre end mod0
+
+```{r}
 x <- data.frame(x = 1:10)
 yc <- predict(mod1, x, interval = "confidence")
 ypi <- predict(mod1, x, interval = "predict")
@@ -70,10 +80,11 @@ ggplot(data, aes(x,y)) +
   geom_line(aes(x, yc[,3]), color = "cyan") +
   geom_line(aes(x, ypi[,2]), color = "red") +
   geom_line(aes(x, ypi[,3]), color = "red")
-  
-# interpret these bounds ( ved ikk lige helt hvad jeg skal skrive her)
+```
 
+interpret these bounds ( ved ikk lige helt hvad jeg skal skrive her)
 
+```{r}
 res <- rstudent(mod1)
 pred <- predict(mod1)
 y <- data$y
@@ -85,8 +96,11 @@ ggplot(cbind(data, res), aes(x, res)) +
 ggplot(cbind(data, pred), aes(pred, res)) +
   geom_point(size = 3)
 
-#tjek assumptions om GLM med de 2 plots
+```
 
+tjek assumptions om GLM med de 2 plots
+
+```{r}
 h <- hatvalues(mod1)
 
 ggplot(cbind(data, h), aes(x, h)) + 
@@ -106,10 +120,11 @@ ggplot(data, aes(x,y)) +
 
 summary(mod9)$r.squared
 summary(mod9)$adj.r.squared
-
-# modellen rammer alle punkterne fuldstaendig, men ville ikke være god til at praedikere nye vaerdier, taenker jeg.
-
-
-
 ```
+
+
+modellen rammer alle punkterne fuldstaendig, men ville ikke være god til at praedikere nye vaerdier, taenker jeg.
+
+
+
 
