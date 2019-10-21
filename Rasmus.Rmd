@@ -98,7 +98,8 @@ ggplot(data, aes(x,y)) +
   geom_line(aes(x, ypi[,3]), color = "red")
 ```
 
-interpret these bounds ( ved ikk lige helt hvad jeg skal skrive her)
+
+Da $n= 10$ gælder den asymptotiske opførsel for konfidensintervallet ikke, hvilket også afspejles i plottet ved den lyseblå linje, da den ikke er tæt ved den regresseret model. Som forventet er prædiktions intervallet større end confidens intervallet.
 
 ####**6. Calculate residuals for the first order model (you may choose which kind of residuals).
 Create residual plots, and use these to check the assumptions behind using a general linear
@@ -116,9 +117,13 @@ ggplot(cbind(data, res), aes(x, res)) +
 ggplot(cbind(data, pred), aes(pred, res)) +
   geom_point(size = 3)
 
+plot(res[-1],res[-length(res)]) #tjek for uafhængighed af residualer
+
 ```
 
-tjek assumptions om GLM med de 2 plots
+Antallet af data punkter gør at de to plots ikke viser noget særligt tydeligt, de skulle gerne vise punkterne vilkårligt fordelt omkring 0, dog kan det både ligne trumpet form(stigende varians), eller at de stiger affint(stigende mean). Hvis man mente det lignte en trumpet form så ville man kunne transformere $Y$ evt. ved en logaritme.
+
+Plottet som viser sammenhængen mellem residualet og det forrige residuale viser ikke at residualerne er afhængige.
 
 ####**7. Calculate leverages for the first order model. For which xi do the measurements yi
 influence the estimates the most?**
@@ -148,11 +153,14 @@ ggplot(data, aes(x,y)) +
 
 summary(mod9)$r.squared
 summary(mod9)$adj.r.squared
+
+#tjek prædikation
+mod9_fun(11)
+
 ```
 
 
-
-modellen rammer alle punkterne fuldstaendig, men ville ikke være god til at praedikere nye vaerdier, taenker jeg.
+modellen rammer alle punkterne fuldstændig, men ville ikke være god til at prædikere nye værdier som vist hvor $11$ er sat in i funktionen og giver $-1141.241$.
 
 
 
