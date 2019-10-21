@@ -10,6 +10,7 @@ library(tidyverse)
 
 ```
 
+####**1. Fit a first and a second order polynomial to the data and plot both in the same plot.**
 
 ```{r}
 data <- data.frame(x = 1:10, y = c(5.52127567436017,
@@ -34,7 +35,12 @@ ggplot(data, aes(x,y)) +
   geom_abline(intercept = mod1$coefficients[1], slope = mod1$coefficients[2], color = "blue") +
   stat_function(fun = mod2_fun, color = "red")
 
+```
 
+####**2. Extract the estimates of β for both models, and test for each parameter whether it can
+be omitted from the model (formulate precise hypotheses H0 and H1). Is the additional
+parameter in the second order polynomial relevant?** 
+```{r}
 #estimat for beta i linear model
 mod1$coefficients[2]
 #estimat for beta i polynomial model
@@ -48,8 +54,10 @@ anova(mod0,mod1)
 anova(mod1,mod2)
 ```
 
+da Pr(>F) > 0.05 accepteres H0 ved 5% signifikans niveau.
 
-da Pr(>F) > 0.05 accepteres H0 ved 5% signifikans niveau
+####**3. For both models calculate both the coefficient of determination and the adjusted coefficient
+of determination. Interpret all four values.** 
 
 
 ```{r}
@@ -59,7 +67,12 @@ summary(mod1)$adj.r.squared
 
 summary(mod2)$r.squared # R^2 og R_adj for mod 2
 summary(mod2)$adj.r.squared
+```
 
+####**4. Make confidence intervals for both of the parameters in β in the first order polynomial.
+Relate these to the hypotheses specified in Exercise 2.2. (Notice: from this exercise and
+onwards we are skipping the second order polynomial.)**
+```{r}
 confint(mod1)
 confint(mod2)
 ```
@@ -67,6 +80,9 @@ confint(mod2)
 
 da konfidens intervallet for beta_2 i mod 2 ligger omkring 0 støtter det hypotesen fra tidligere om at beta_2 = 0
 da konfidens intervallet for beta_1 i mod 1 ikke ligger omkring 0, så viser det at beta_1 ikke er lig 0 og altså er mod1 bedre end mod0
+
+####**5. Make confidence and prediction bounds for a self-chosen range of x-values in the first order
+polynomial. Plot these on top of the data, and interpret both bounds**
 
 ```{r}
 x <- data.frame(x = 1:10)
@@ -84,6 +100,10 @@ ggplot(data, aes(x,y)) +
 
 interpret these bounds ( ved ikk lige helt hvad jeg skal skrive her)
 
+####**6. Calculate residuals for the first order model (you may choose which kind of residuals).
+Create residual plots, and use these to check the assumptions behind using a general linear
+model on this data.**
+
 ```{r}
 res <- rstudent(mod1)
 pred <- predict(mod1)
@@ -100,6 +120,9 @@ ggplot(cbind(data, pred), aes(pred, res)) +
 
 tjek assumptions om GLM med de 2 plots
 
+####**7. Calculate leverages for the first order model. For which xi do the measurements yi
+influence the estimates the most?**
+
 ```{r}
 h <- hatvalues(mod1)
 
@@ -107,7 +130,12 @@ ggplot(cbind(data, h), aes(x, h)) +
   geom_point(size = 3)
 
 # leveragen er hoejst i starten og slutningen
+```
+####**8. Fit a ninth order polynomial to the data and plot this on top of the data. What happens?
+Calculate the coefficient of determination. Is this model better at describing the data than
+the first and second order polynomials?**
 
+```{r}
 mod9 <- lm(y ~ poly(x, 9, raw = TRUE), data)
 cof9 <- coef(mod9)
 mod9_fun <- function(x) {
@@ -121,6 +149,7 @@ ggplot(data, aes(x,y)) +
 summary(mod9)$r.squared
 summary(mod9)$adj.r.squared
 ```
+
 
 
 modellen rammer alle punkterne fuldstaendig, men ville ikke være god til at praedikere nye vaerdier, taenker jeg.
