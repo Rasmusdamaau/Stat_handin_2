@@ -7,12 +7,10 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
 library(tidyverse)
-
 ```
 
-#**1. Fit a first and a second order polynomial to the data and plot both in the same plot.**
+## **1. Fit a first and a second order polynomial to the data and plot both in the same plot.**
 
 ```{r}
 data <- data.frame(x = 1:10, y = c(5.52127567436017,
@@ -39,7 +37,7 @@ ggplot(data, aes(x,y)) +
 
 ```
 
-#**2. Extract the estimates of beta for both models, and test for each parameter whether it can
+## **2. Extract the estimates of beta for both models, and test for each parameter whether it can
 be omitted from the model (formulate precise hypotheses H0 and H1). Is the additional
 parameter in the second order polynomial relevant?** 
 ```{r}
@@ -58,7 +56,7 @@ anova(mod1,mod2)
 
 da Pr(>F) > 0.05 accepteres H0 ved 5% signifikans niveau.
 
-###**3. For both models calculate both the coefficient of determination and the adjusted coefficient
+## **3. For both models calculate both the coefficient of determination and the adjusted coefficient
 of determination. Interpret all four values.** 
 
 
@@ -71,7 +69,7 @@ summary(mod2)$r.squared # R^2 og R_adj for mod 2
 summary(mod2)$adj.r.squared
 ```
 
-###**4. Make confidence intervals for both of the parameters in beta in the first order polynomial.
+## **4. Make confidence intervals for both of the parameters in beta in the first order polynomial.
 Relate these to the hypotheses specified in Exercise 2.2. (Notice: from this exercise and
 onwards we are skipping the second order polynomial.)**
 ```{r}
@@ -83,7 +81,7 @@ confint(mod2)
 da konfidens intervallet for beta_2 i mod 2 ligger omkring 0 støtter det hypotesen fra tidligere om at beta_2 = 0
 da konfidens intervallet for beta_1 i mod 1 ikke ligger omkring 0, så viser det at beta_1 ikke er lig 0 og altså er mod1 bedre end mod0
 
-###**5. Make confidence and prediction bounds for a self-chosen range of x-values in the first order
+## **5. Make confidence and prediction bounds for a self-chosen range of x-values in the first order
 polynomial. Plot these on top of the data, and interpret both bounds**
 
 ```{r}
@@ -103,7 +101,7 @@ ggplot(data, aes(x,y)) +
 
 Da n= 10 gælder den asymptotiske opførsel for konfidensintervallet ikke, hvilket også afspejles i plottet ved den lyseblå linje, da den ikke er tæt ved den regresseret model. Som forventet er prædiktions intervallet større end confidens intervallet.
 
-###**6. Calculate residuals for the first order model (you may choose which kind of residuals).
+## **6. Calculate residuals for the first order model (you may choose which kind of residuals).
 Create residual plots, and use these to check the assumptions behind using a general linear
 model on this data.**
 
@@ -127,7 +125,7 @@ Antallet af data punkter gør at de to plots ikke viser noget særligt tydeligt,
 
 Plottet som viser sammenhængen mellem residualet og det forrige residuale viser ikke at residualerne er afhængige.
 
-###**7. Calculate leverages for the first order model. For which xi do the measurements yi
+## **7. Calculate leverages for the first order model. For which xi do the measurements yi
 influence the estimates the most?**
 
 ```{r}
@@ -139,7 +137,7 @@ ggplot(cbind(data, h), aes(x, h)) +
 # leveragen er hoejst i starten og slutningen
 ```
 
-###**8. Fit a ninth order polynomial to the data and plot this on top of the data. What happens?
+## **8. Fit a ninth order polynomial to the data and plot this on top of the data. What happens?
 Calculate the coefficient of determination. Is this model better at describing the data than
 the first and second order polynomials?**
 
