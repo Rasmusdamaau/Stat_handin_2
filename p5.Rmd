@@ -1,0 +1,310 @@
+---
+title: "P5-HOME"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(DT)
+library(GGally)
+# load("C:/Users/rasmu/OneDrive - Aalborg Universitet/0P5/R-projekt-p5/HOME dataset updated/HOME.Rda")
+load("C:/Users/rasmu/OneDrive - Aalborg Universitet/0P5/R-projekt-p5/HOME dataset updated/HOME_med_koordinater.Rda")
+
+# load("D:/OneDrive - Aalborg Universitet/0P5/R-projekt-p5/HOME dataset updated/HOME.Rda")
+```
+
+
+```{r}
+HOME <- select(HOME, -c(NytKokken, NyeVinduer, NytBadevaerelse, AntalSovevaerelser, TaetVedVand))
+
+HOME$OmbygningSket <- factor(HOME$OmbygningSket)
+HOME$Hoejhus <- factor(HOME$Hoejhus)
+HOME$Storgrund <- factor(HOME$Storgrund)
+HOME$Kaelder <- factor(HOME$Kaelder)
+HOME$Kvartal4 <- factor(HOME$Kvartal4)
+HOME$Kvartal3 <- factor(HOME$Kvartal3)
+HOME$Kvartal2 <- factor(HOME$Kvartal2)
+HOME$Kvartal1 <- factor(HOME$Kvartal1)
+HOME$MangeToil <- factor(HOME$MangeToil)
+HOME$Salgsaar <- as.integer(HOME$Salgsaar)
+HOME$GarageCarport <- factor(HOME$GarageCarport)
+HOME$Altan <- factor(HOME$Altan)
+HOME$AntalToiletter <- factor(HOME$AntalToiletter)
+HOME$AntalPlan <- factor(HOME$AntalPlan)
+HOME$Boligtilstand <- factor(HOME$Boligtilstand)
+HOME$EjdType <- factor(HOME$EjdType)
+HOME$Liggetid <- as.integer(HOME$Liggetid)
+
+EL_HOME <- HOME %>% filter(EjdType == "Ejerlejlighed") %>% 
+  filter(Postnr == 9000) %>% 
+  na.omit()
+```
+
+```{r}
+mod1 <- lm(Kontantpris ~ Boligtilstand + Boligareal + AntalToiletter + Altan + OmbygningSket + Opfoerelsesaar + Liggetid + Salgsaar + Alder, data = EL_HOME)
+summary(mod1)
+
+res1 <- rstudent(mod1)
+pred1 <- predict(mod1)
+
+ggplot(cbind(EL_HOME, res1, pred1), aes(Kontantpris, res1)) +
+  geom_point()
+
+ggplot(cbind(EL_HOME, res1, pred1), aes(pred1, res1)) +
+  geom_point()
+```
+
+
+```{r}
+EL_HOME <- EL_HOME %>% filter(Kontantpris < 3e+06) %>% filter(Boligareal < 200)
+
+mod2 <- lm(log(Kontantpris) ~  Alder + Altan + Boligareal  + OmbygningSket + Opfoerelsesaar + Salgsaar, data = EL_HOME)
+summary(mod2)
+
+res2 <- rstudent(mod2)
+pred2 <- predict(mod2)
+
+ggplot(cbind(EL_HOME, res2, pred2), aes(log(Kontantpris), res2)) +
+  geom_point()
+
+ggplot(cbind(EL_HOME, res2, pred2), aes(pred2, res2)) +
+  geom_point()
+
+summary(res2)
+summary(exp(pred2))
+summary(EL_HOME$Kontantpris)
+summary(EL_HOME$Kontantpris - exp(pred2))
+
+ggplot(cbind(EL_HOME, exp(pred2), index = seq_along(pred2)), aes(index, Kontantpris)) + 
+  geom_point(color = "blue") +
+  geom_point(aes(index, exp(pred2)), color = "red")
+
+
+```
+
+
+
+
+
+```{r}
+# afstikker <- function(para) {
+#   qplot(seq_along(EL_HOME[,para]), EL_HOME[,para])
+# }
+# 
+# afstik_test <- c("Kontantpris", "Boligareal", "Kaelderareal", "AntalToiletter", "Grundareal", "AntalPlan")
+# 
+# afstikker(afstik_test[6]) # til at tjekke efter afstikkere
+
+min_kontantpris <- mean(EL_HOME$Kontantpris) - sd(EL_HOME$Kontantpris)
+max_kontantpris <- mean(EL_HOME$Kontantpris) + sd(EL_HOME$Kontantpris)
+
+min_boligareal <- mean(EL_HOME$Boligareal) - sd(EL_HOME$Boligareal)
+max_boligareal <- mean(EL_HOME$Boligareal) + sd(EL_HOME$Boligareal)
+
+min_kaelderareal <- mean(EL_HOME$Kaelderareal) - sd(EL_HOME$Kaelderareal)
+max_kaelderareal <- mean(EL_HOME$Kaelderareal) + sd(EL_HOME$Kaelderareal)
+
+min_antaltoiletter <- 0
+max_antaltoiletter <- 3
+
+EL_HOME_afstik <- EL_HOME %>% filter(between(Kontantpris, min_kontantpris, max_kontantpris)) %>% 
+  filter(between(Boligareal,min_boligareal,max_boligareal)) %>% 
+  filter(between(Kaelderareal, min_kaelderareal, max_kaelderareal)) %>% 
+  filter(between(as.numeric(AntalToiletter), min_antaltoiletter, max_antaltoiletter)) %>%
+  filter(Grundareal == 0)
+
+# EL_HOME_afstik_kvm <- EL_HOME_afstik %>% mutate(KVM = Kontantpris / Boligareal)
+
+# EL_HOME_afstik$Kontantpris <- log10(EL_HOME_afstik$Kontantpris)
+
+# mod1_kvm <- lm(KVM ~ Boligtilstand + AntalToiletter + Altan + OmbygningSket + Opfoerelsesaar + Liggetid + Salgsaar, data = EL_HOME_afstik_kvm)
+
+mod0 <- lm(Kontantpris ~ 1, data = EL_HOME_afstik)
+mod1 <- lm(Kontantpris ~ Boligtilstand + Boligareal + AntalToiletter + Altan + OmbygningSket + Opfoerelsesaar + Liggetid + Salgsaar, data = EL_HOME_afstik)
+mod0 <- lm(Kontantpris ~ Boligtilstand + AntalToiletter + OmbygningSket + Liggetid, data = EL_HOME_afstik)
+
+modsim <- lm(Kontantpris ~ Boligareal, data = EL_HOME_afstik)
+modsim2 <- lm(Kontantpris ~ Boligareal + AntalToiletter, data = EL_HOME_afstik)
+
+anova(mod0, modsim)
+anova(modsim,modsim2)
+
+ggplot(EL_HOME_afstik, aes(Boligareal, Kontantpris)) +
+  geom_point() +
+  geom_abline(slope = coef(modsim)[2], intercept = coef(modsim)[1], color = "red") +
+  geom_abline(slope = 0, intercept = coef(mod0), color = "blue")
+
+modsim_pred <- predict(modsim2)
+index <- seq_along(modsim_pred)
+ggplot(cbind(EL_HOME_afstik, modsim_pred, index), aes(index, Kontantpris)) +
+  geom_point(color = "blue") +
+  geom_point(aes(index, modsim_pred), color = "red")
+
+anova(mod0,modsim)
+summary(modsim)
+summary(mod0)
+summary(mod1)
+# summary(mod1_kvm)
+# coefficients(summary(mod0))
+# coefficients(summary(mod1))
+# 
+# summary(mod1)$adj.r.squared
+# summary(mod0)$adj.r.squared
+
+
+# res0 <- rstudent(mod0)
+res1 <- rstudent(modsim)
+# res1_kvm <- rstudent(mod1_kvm)
+pred1 <- predict(modsim)
+# pred1kvm <- predict(mod1_kvm)
+
+ggplot(cbind(EL_HOME_afstik,res1), aes(Kontantpris, res1)) +
+  geom_point()
+
+ggplot(cbind(EL_HOME_afstik, pred1, res1), aes(pred1, res1)) +
+  geom_point()
+
+# ggplot(cbind(EL_HOME_afstik_kvm,res1_kvm), aes(Kontantpris, res1_kvm)) +
+#   geom_point()
+# 
+# ggplot(cbind(EL_HOME_afstik_kvm, pred1, res1_kvm), aes(pred1, res1_kvm)) +
+#   geom_point()
+
+plot(res1[-1],res1[-length(res1)])
+
+# plot(EL_HOME_afstik_kvm$KVM, pred1kvm)
+# summary(pred1kvm - EL_HOME_afstik_kvm$KVM)
+
+
+# plot(hatvalues(mod1))
+# 
+anova(mod0, mod1)
+
+# yc <- predict(mod1, EL_HOME_afstik, interval = "confidence")
+# ypi <- predict(mod1, EL_HOME_afstik, interval = "predict")
+# 
+# ggplot(cbind(EL_HOME_afstik, yc[,1],yc[,2], yc[,3], ypi[,1], ypi[,2], ypi[,3], index = seq_along(yc[,1])), aes(index, Kontantpris)) +
+#   geom_point() +
+#   geom_line(aes(index, yc[,2]), color = "blue") +
+#   geom_line(aes(index, yc[,3]), color = "blue") +
+#   geom_line(aes(index, ypi[,2]), color = "red") +
+#   geom_line(aes(index, ypi[,3]), color = "red")
+
+params <- c("Boligtilstand", "Boligareal", "AntalToiletter", "Altan", "OmbygningSket", "Opfoerelsesaar", "Liggetid", "Salgsaar")
+# 
+param_comb <- combn(params, 3)
+
+
+```
+
+
+
+```{r}
+Boligtilstand + Boligareal + AntalToiletter + Altan + OmbygningSket + Opfoerelsesaar + Liggetid + Salgsaar
+mod <- lm(Kontantpris ~ I(cos(Opfoerelsesaar)) + Liggetid + Boligareal + AntalToiletter, data = EL_HOME_afstik)
+res <- rstandard(mod)
+pred <- predict(mod)
+
+ggplot(cbind(EL_HOME_afstik,res), aes(Kontantpris, res)) +
+  geom_point()
+
+ggplot(cbind(EL_HOME_afstik, pred, res), aes(pred, res)) +
+  geom_point()
+
+summary(mod)
+
+index <- seq_along(pred)
+ggplot(cbind(EL_HOME_afstik, pred, index), aes(index, Kontantpris)) +
+  geom_point(color = "blue") +
+  geom_point(aes(index, pred), color = "red")
+
+ggplot(EL_HOME_afstik, aes(Opfoerelsesaar, Kontantpris)) +
+  geom_point() +
+  geom_abline(intercept = coef(model)[1], slope = coef(model)[2])
+
+model <- lm(Kontantpris ~ Opfoerelsesaar, data = EL_HOME_afstik)
+model2 <- lm(Kontantpris ~ I(Opfoe))
+
+res1 <- rstudent(model)
+plot(res1[-1],res1[-length(res1)])
+
+
+ggplot(EL_HOME_afstik, aes(Salgsaar, Kontantpris)) +
+  geom_point()
+
+HOME <- HOME %>% mutate(kvm = Kontantpris / Boligareal)
+
+mean_data <- HOME %>% group_by(Salgsaar) %>% summarise(average = mean(kvm))
+
+ggplot(mean_data, aes(Salgsaar, average)) +
+  geom_point()
+
+antal_data <- HOME %>% group_by(Salgsaar) %>% summarise(antal = n())
+
+ggplot(antal_data, aes(Salgsaar, antal)) +
+  geom_point(aes(size = antal))
+
+range(HOME$Salgsaar)
+
+HOME_uden_na <- HOME %>% na.omit()
+
+
+mod <- lm(log(Kontantpris) ~ cos(Opfoerelsesaar) + Liggetid + Boligareal + AntalToiletter + Altan + OmbygningSket + Salgsaar, data = EL_HOME_afstik)
+res <- rstandard(mod)
+pred <- predict(mod)
+
+ggplot(cbind(EL_HOME_afstik,res), aes(Kontantpris, res)) +
+  geom_point()
+
+ggplot(cbind(EL_HOME_afstik, pred, res), aes(pred, res)) +
+  geom_point()
+
+confint(mod)
+summary(mod)
+
+
+mod <- lm(log(Kontantpris) ~ cos(Opfoerelsesaar) + Liggetid + Boligareal + AntalToiletter + Altan + OmbygningSket + Salgsaar, data = HOME_uden_na)
+res <- rstandard(mod)
+pred <- predict(mod)
+
+ggplot(cbind(HOME_uden_na,res), aes(Kontantpris, res)) +
+  geom_point()
+
+ggplot(cbind(HOME_uden_na, pred, res), aes(pred, res)) +
+  geom_point()
+
+confint(mod)
+summary(mod)
+
+
+```
+
+
+
+```{r echo=FALSE}
+
+# datatable(subset(HOME, HOME$Postnr == 9430), options = list(pageLength = 5))
+
+library("dataMaid")
+makeDataReport(EL_HOME, output = "pdf", ordering = "asIs")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
