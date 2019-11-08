@@ -1,28 +1,63 @@
 ---
-title: "Anders"
-output: html_document
+title: "Handin 3.3"
+author: "Ajes"
+date: "4/11/2019"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Opgave 1
+Read the data into R and plot the data. Argue that it is not a good idea to use a general linear model
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r, include = FALSE}
+library("readxl")
+DATA_HANDIN <- read_excel("Downloads/DATA_HANDIN.xlsx")
+data <- DATA_HANDIN
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+plot(data)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Opgave 2
+Use the glm function to fit a simple inverse Gaussian regression model to the data with the link function used by R. (Hint: In glm, use family=inverse.gaussian(link="1/mu^2")). Extract the estimated β parameters
+
+```{r}
+x <- data$x
+y <- as.numeric(data$y)
+mu <- mean(y)
+
+mod = glm(formula=y~x,family=inverse.gaussian(link = "1/mu^2"))
+coef = coefficients(mod); coef
+```
+
+
+## Opgave 3
+
+```{r}
+confbeta = confint.default(mod); confbeta
+```
+
+
+## Opgave 4
+
+```{r}
+curve((coef[1] + coef[2]*x)^(1/(-2)),add=TRUE,col="red") 
+```
+
+
+## Opgave 5
+
+```{r}
+D = deviance(mod); D
+1-pchisq(D,length(x)-length(coef))
+```
+
+
+
