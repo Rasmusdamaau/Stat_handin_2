@@ -67,7 +67,6 @@ sum((abs(rdev) > 2))
 Af plottet ligner det at modellen passer godt, dette afspejles også i at det kun er 6 residualer som ligger over/under 2,-2.
 
 
-
 ## Opgave 5
 Make a goodness of fit test to check the fit of the model.
 ```{r}
