@@ -1,6 +1,6 @@
 ---
 title: "Handin 3.3"
-author: "Ajes"
+author: "Gr. 5.217b"
 date: "4/11/2019"
 output:
   pdf_document: default
@@ -18,18 +18,24 @@ Read the data into R and plot the data. Argue that it is not a good idea to use 
 library("readxl")
 DATA_HANDIN <- read_excel("DATA_HANDIN.xlsx")
 data <- DATA_HANDIN
+data$y <- as.numeric(data$y)
 ```
 
 ```{r}
 plot(data)
+qqnorm(data$y)
+qqline(data$y)
 ```
+
+Det ses af qq-plottet at dataen ikke følger en normal fordeling og det ville derfor være fordel-agtigt ikke at anvende en generel lineær model.
+
 
 ## Opgave 2
 Use the glm function to fit a simple inverse Gaussian regression model to the data with the link function used by R. (Hint: In glm, use family=inverse.gaussian(link="1/mu^2")). Extract the estimated $\beta$ parameters
 
 ```{r}
+y <- data$y
 x <- data$x
-y <- as.numeric(data$y)
 mu <- mean(y)
 
 mod = glm(formula=y~x,family=inverse.gaussian(link = "1/mu^2"))
@@ -42,6 +48,8 @@ Create confidence intervals for the $\beta$ parameters. Do the confidence interv
 ```{r}
 confbeta = confint.default(mod); confbeta
 ```
+
+Da koefficienterne anvendt til at simulere er $2200$ og $-2$ ligger disse inde i konfidensintervallerne fundet ovenover.
 
 
 ## Opgave 4
