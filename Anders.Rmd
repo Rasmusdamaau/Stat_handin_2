@@ -9,13 +9,14 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library("readxl")
 ```
 
 ## Opgave 1
 Read the data into R and plot the data. Argue that it is not a good idea to use a general linear model
 
-```{r, include = FALSE}
-library("readxl")
+```{r}
 DATA_HANDIN <- read_excel("DATA_HANDIN.xlsx")
 data <- DATA_HANDIN
 data$y <- as.numeric(data$y)
@@ -56,8 +57,15 @@ Da koefficienterne anvendt til at simulere er $2200$ og $-2$ ligger disse inde i
 Plot the estimated curve $\hat{\mu} = g^{-1}(\hat{\beta_0} + \hat{\beta_1}x)$ on top of the data. Does it fit?
 ```{r}
 plot(data)
-curve((coef[1] + coef[2]*x)^(1/(-2)),add=TRUE,col="red") 
+curve((coef[1] + coef[2]*x)^(1/(-2)),add=TRUE,col="red")
+
+rdev <- residuals(mod, "deviance")
+plot(rdev)
+sum((abs(rdev) > 2))
 ```
+
+Af plottet ligner det at modellen passer godt, dette afspejles også i at det kun er 6 residualer som ligger over/under 2,-2.
+
 
 
 ## Opgave 5
@@ -67,5 +75,6 @@ D = deviance(mod); D
 1-pchisq(D,length(x)-length(coef))
 ```
 
+$p>0.05$ viser at der ikke er mangel på fit.
 
 
