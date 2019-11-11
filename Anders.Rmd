@@ -16,7 +16,7 @@ Read the data into R and plot the data. Argue that it is not a good idea to use 
 
 ```{r, include = FALSE}
 library("readxl")
-DATA_HANDIN <- read_excel("Downloads/DATA_HANDIN.xlsx")
+DATA_HANDIN <- read_excel("DATA_HANDIN.xlsx")
 data <- DATA_HANDIN
 ```
 
@@ -38,7 +38,7 @@ coef = coefficients(mod); coef
 
 
 ## Opgave 3
-Create confidence intervals for the β parameters. Do the confidence intervals agree with the model used for simulating the data?
+Create confidence intervals for the $\beta$ parameters. Do the confidence intervals agree with the model used for simulating the data?
 ```{r}
 confbeta = confint.default(mod); confbeta
 ```
@@ -47,6 +47,7 @@ confbeta = confint.default(mod); confbeta
 ## Opgave 4
 Plot the estimated curve $\hat{\mu} = g^{-1}(\hat{\beta_0} + \hat{\beta_1}x)$ on top of the data. Does it fit?
 ```{r}
+plot(data)
 curve((coef[1] + coef[2]*x)^(1/(-2)),add=TRUE,col="red") 
 ```
 
